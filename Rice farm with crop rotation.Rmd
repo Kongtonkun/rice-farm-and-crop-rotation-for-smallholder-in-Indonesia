@@ -356,14 +356,15 @@ compound_figure(mcSimulation_object = crop_rotation_mc_simulation,
 
 ## Conclusion
 
-1. Our project has proven that selecting the appropriate crop rotation between rice, soybean, and chili to produce the best profits is crucial for achieving optimal results.
-2. The decision to rotate crops between rice and chili is still applicable with slightly smaller profits.
-3. Crop rotation between rice, soybeans, and rice is less efficient than other options with respect to profit and sustainability.
-
+1. This project has proven that selecting the appropriate crop rotation between rice, soybean, and chili seem profitable for achieving optimal results with respect to sustainable income for rice farming.
+2. The decision to rotate crops between rice and chili is still applicable with slightly smaller profits. 
+3. Crop rotation between rice, soybean, and rice is less efficient than other options with respect to sustainable income.
 
 ## Recommendtion
 
-It is highly recommended for Indonesian smallholder farmers to implement three crop rotations (rice, soybean, and chili) as it is more suitable for sustainable development.
+1.We recommend Indonesian smallholder farmers to implement crop rotation either for three crops (rice, soybean, and chili) or two crops (rice and chili) as it seems more profitable than growing rice only all year around.
+
+2.However, we would **not recommend** to implement crop rotation between **rice and soybean** as it seems not so profitable.
 
 ## What have we learned from this project?
 
