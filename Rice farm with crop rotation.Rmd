@@ -3,8 +3,8 @@ title: "Rice farming with crop rotation for smallholder farmers in Indonesia"
 author: "Noviria Syifaun Nafsi, Sineenad Kongtonkun, Inkyin May, Vani Lian"
 date: "2023-07-13"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 bibliography:
 - references.bib
 - export.bib
@@ -167,13 +167,6 @@ crop_rotation_decision <- function(){
               cashflow_rice_chili = cashflow_rice_chili
   ))
 }
-
-
-make_variables<-function(est,n=1)
-{ x<-random(rho=est, n=n)
-for(i in colnames(x)) assign(i, as.numeric(x[1,i]),envir=.GlobalEnv)}
-
-make_variables(read.csv("new_variable_estimates.csv"))
 
 # Run the Monte Carlo simulation using the model function
 input_estimates <- read.csv("new_variable_estimates.csv", sep=";")
@@ -379,7 +372,7 @@ compound_figure(mcSimulation_object = crop_rotation_mc_simulation,
 ## Conclusion
 
 1. This project has proven that selecting the appropriate crop rotation between rice, soybean, and chili seem profitable for achieving optimal results with respect to higher income for rice farming.
-2. The decision to rotate crops between rice and chili is still applicable with slightly smaller profits. 
+2. The decision to rotate crops between rice and chili is still applicable with slightly smaller profits.
 3. Crop rotation between rice, soybean, and rice is less efficient than other options with respect to sustainable income.
 
 ## Recommendtion
