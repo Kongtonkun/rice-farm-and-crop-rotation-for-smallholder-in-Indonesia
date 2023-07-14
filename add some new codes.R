@@ -1,96 +1,10 @@
----
-title: "Rice farming with crop rotation for smallholder farmers in Indonesia"
-author: "Noviria Syifaun Nafsi, Sineenad Kongtonkun, Inkyin May, Vani Lian"
-date: "2023-07-13"
-output:
-  pdf_document: default
-  html_document: default
-bibliography:
-- references.bib
-- export.bib
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-## Introduction
-### Overview
-
-  Indonesia is the largest country in Southeast Asia. Rice is the primary staple food crop with a steady increase in annual production, making Indonesia the third largest rice producer in the world. 93% of Indonesia’s total number of farmers are small family farms. Rice is the main crop grown and staple food in Southeast Asia.(@Yoshida1981)
-  Crop rotation is the practice of planting different crops sequentially on the same plot of land to improve soil health, optimize nutrients in the soil, and combat pest and weed pressure.(@Crystal2004)
-  Soybean is a species of legume native to East Asia, widely grown for its edible bean which has numerous uses.(@Wright2005)
-  Chili is a plant of tropical and subtropical regions  for their fleshy fruits.(@MOALF2016)
-  
-### Motivation
-
-1. Rice is the primary staple food crop with a steady increase in annual production, making Indonesia the third largest rice producer in the world. 
-2. Crop rotation can increase crop yields and income than monoculture of rice and it can help disrupt the lifecycle of crop pests and reducing chemical use.
-3. Soybean can increase soil fertility and give extra income to farmers.
-4. Chili cultivation can improve farmers' income  because of good market price.
-
-
-### Overview of the project
-
-<center>
-```{r echo=FALSE}
-knitr::include_graphics('Photo rice farm with crop rotation/overview of the project.png')
-```
-</center>
-
-
-### Conceptual model 
-
-This project will analyse the decision of crop rotation (soybean and chili) with rice farming.
-Total cost is calculated for each crop, which consists of labor, seeds, pesticides, fertilizer, machinery and rent land. 
-The revenues is calculated for each crop production by multiplying the yield of each crop by the selling price of each crop per ha. 
-The total cost, revenues and discount rate are used as variable estimates in order to calculate the Net Present Value (NVP).
-
-```{r echo=FALSE}
-knitr::include_graphics('Photo rice farm with crop rotation/conceptual model.png')
-```
-
-
-### Variable used in conceptual model
-
-```{r eval=FALSE, include=FALSE}
-read.csv("new_variable_estimates.csv",sep=";")
-```
-
-<center>
-```{r echo=FALSE}
-knitr::include_graphics('Photo rice farm with crop rotation/Variable estimate.png')
-```
-</center>
-Variable for rice farm and crop rotation for small holder farmers in Indonesia have 8 mains variables that are consist of rice production, rice cultivation cost, soybean production, soybean cultivation cost, chili production, chili cultivation cost, discount rate and year of system. Overall, there are 33 variables that are used for this decision analysis.
-
-####Source:
-@BPS2018, @Mucharam2020, @Jagung2017, @Fao2018, @BPS2022, @Amirrullah2019, @Crystal2004, @Jagung2017, @BRIN2022, @USDA2012, @Setiartiti2021, @Antriyandarti2015, @Krisdiana2021, @Harsono2020, @Schilling1999, @Wandschneider2019, @Sundari2021
-
-## Estimate Calculation
-```{r echo=FALSE}
-knitr::include_graphics('Photo rice farm with crop rotation/Estimate calculation.png')
-```
-**NPV (Net Present Value)**: In financial terms, the NPV the measurement of the profitability of a project or programme. This is achieved by subtracting the current values of expenditure from the current values of income over a period of time. Income can be referred to as benefit and expenditure can be referred to as cost.
-
-**Discount Rate**: The discount rate is the interest rate used in analysis of discounted cash flow (DCF).
-
-@Stantec2005
-
-
-
-## Decision analysis
-### R code
-
-@Do2020
-
-```{r include=FALSE}
 library(tidyverse)
 library(decisionSupport)
 library(ggplot2)
-```
 
-```{r echo=TRUE}
+read.csv("new_variable_estimates.csv", sep=";")
+
+
 crop_rotation_decision <- function(){
   
   # Estimate the income of rice in a normal season
@@ -149,6 +63,7 @@ crop_rotation_decision <- function(){
   
   
   # Cashflow
+  cashflow_rice_cultivation <- rice_cultivation_result
   cashflow_crop_rotation <- crop_rotation_result - rice_cultivation_result
   cashflow_rice_soybean <- rice_soybean_result - rice_cultivation_result
   cashflow_rice_chili <- rice_chili_result - rice_cultivation_result
@@ -162,6 +77,7 @@ crop_rotation_decision <- function(){
               NPV_decision_crop_rotation = NPV_crop_rotation - NPV_rice,
               NPV_decision_rice_soybean = NPV_rice_soybean - NPV_rice,
               NPV_decision_rice_chili = NPV_rice_chili - NPV_rice,
+              cashflow_rice_cultivation = cashflow_rice_cultivation,
               cashflow_crop_rotation = cashflow_crop_rotation,
               cashflow_rice_soybean = cashflow_rice_soybean,
               cashflow_rice_chili = cashflow_rice_chili
@@ -173,7 +89,9 @@ make_variables<-function(est,n=1)
 { x<-random(rho=est, n=n)
 for(i in colnames(x)) assign(i, as.numeric(x[1,i]),envir=.GlobalEnv)}
 
-make_variables(read.csv("new_variable_estimates.csv"))
+make_variables(estimate_read_csv("new_variable_estimates.csv"))
+
+
 
 # Run the Monte Carlo simulation using the model function
 input_estimates <- read.csv("new_variable_estimates.csv", sep=";")
@@ -183,23 +101,10 @@ crop_rotation_mc_simulation <- mcSimulation(estimate = as.estimate(input_estimat
                                             numberOfModelRuns = 1000,
                                             functionSyntax = "plainNames")
 
-# Run the Monte Carlo simulation using the model function
-input_estimates <- read.csv("new_variable_estimates.csv", sep=";")
 
-crop_rotation_mc_simulation <- mcSimulation(estimate = as.estimate(input_estimates),
-                                            model_function = crop_rotation_decision,
-                                            numberOfModelRuns = 1000,
-                                            functionSyntax = "plainNames")
+# plot NPV distribution analysis
 
-```
-
-
-### Plot NPV distribution analysis
-
-#### NPV for crop rotation (rice-soybean-chili)
-
-```{r echo=TRUE}
-
+#if rice with soybean and chili (rice-soybean-chili)
 decisionSupport::plot_distributions(mcSimulation_object = crop_rotation_mc_simulation, 
                                     vars = c("crop_rotation_NPV", "Rice_NPV"),
                                     method = 'smooth_simple_overlay')
@@ -212,14 +117,10 @@ decisionSupport::plot_distributions(mcSimulation_object = crop_rotation_mc_simul
                                     vars = c("NPV_decision_crop_rotation"),
                                     method = 'boxplot_density')
 
-```
 
 
 
-#### NPV for crop rotation (rice-soybean-rice)
-
-```{r echo=TRUE}
-
+#if rice with soybean (rice-soybean-rice)
 decisionSupport::plot_distributions(mcSimulation_object = crop_rotation_mc_simulation, 
                                     vars = c("rice_soybean_NPV","Rice_NPV"),
                                     method = 'smooth_simple_overlay')
@@ -232,14 +133,10 @@ decisionSupport::plot_distributions(mcSimulation_object = crop_rotation_mc_simul
                                     vars = c("NPV_decision_rice_soybean"),
                                     method = 'boxplot_density')
 
-```
 
 
 
-#### NPV for crop rotation (rice-chilli)
-
-```{r echo=TRUE}
-
+#if rice with chili (rice-chili)
 decisionSupport::plot_distributions(mcSimulation_object = crop_rotation_mc_simulation, 
                                     vars = c("rice_chili_NPV","Rice_NPV"),
                                     method = 'smooth_simple_overlay')
@@ -253,152 +150,83 @@ decisionSupport::plot_distributions(mcSimulation_object = crop_rotation_mc_simul
                                     method = 'boxplot_density')
 
 
-```
 
 
 
-### Cashflow analysis
+# cashflow analysis
 
-#### With crop rotation of 3 crops (rice-soybean-chili)
+#with decision
+plot_cashflow(mcSimulation_object = crop_rotation_mc_simulation, cashflow_var_name = "cashflow_rice_cultivation")
 
-```{r echo=TRUE}
+#with crop rotation of 3 crops
 plot_cashflow(mcSimulation_object = crop_rotation_mc_simulation, cashflow_var_name = "cashflow_crop_rotation")
-```
 
-#### With crop rotation of rice and soybean (rice-soybean-rice)
-
-```{r echo=TRUE}
+#with crop rotation of rice and soybean (rice-soybean-rice)
 plot_cashflow(mcSimulation_object = crop_rotation_mc_simulation, cashflow_var_name = "cashflow_rice_soybean")
-```
 
-
-#### With crop rotation of rice and chili (rice-chili)
-
-```{r echo=TRUE}
-
+#with crop rotation of rice and chili (rice-chili)
 plot_cashflow(mcSimulation_object = crop_rotation_mc_simulation, cashflow_var_name = "cashflow_rice_chili")
-```
 
 
-### Value of Information (VoI) analysis
 
-
-```{r echo=TRUE}
+# VoI analysis
 mcSimulation_table <- data.frame(crop_rotation_mc_simulation$x, crop_rotation_mc_simulation$y[1:7])
-```
 
-
-#### EVPI crop rotation
-
-```{r echo=TRUE}
 evpi_crop_rotation <- multi_EVPI(mc = mcSimulation_table, first_out_var = "crop_rotation_NPV")
 plot_evpi(evpi_crop_rotation, decision_vars = "NPV_decision_crop_rotation")
-```
 
 
-#### EVPI rice and soybean
-
-```{r echo=TRUE}
 evpi_rice_soybean <- multi_EVPI(mc = mcSimulation_table, first_out_var = "rice_soybean_NPV")
 plot_evpi(evpi_rice_soybean, decision_vars = "NPV_decision_rice_soybean")
-```
 
-#### EVPI rice and chilli
 
-```{r echo=TRUE}
 evpi_rice_chili <- multi_EVPI(mc = mcSimulation_table, first_out_var = "rice_chili_NPV")
 plot_evpi(evpi_rice_chili, decision_vars = "NPV_decision_rice_chili")
-```
 
 
-### Projection to Latent Structures (PLS) analysis
 
-#### With crop rotation of 3 crops (rice-soybean-chili)
+# Projection to Latent Structures (PLS) analysis
 
-```{r echo=TRUE}
+#with crop rotation of rice, soybean, and chili
 pls_result_crop_rotation <- plsr.mcSimulation(object = crop_rotation_mc_simulation,
                                               resultName = names(crop_rotation_mc_simulation$y)[5], ncomp = 1)
 plot_pls(pls_result_crop_rotation, threshold = 0)
-```
 
 
-#### With crop rotation of rice and soybean (rice-soybean-rice)
-
-```{r echo=TRUE}
+#with crop rotation of rice and soybean (rice-soybean-rice)
 pls_result_rice_soybean <- plsr.mcSimulation(object = crop_rotation_mc_simulation,
                                              resultName = names(crop_rotation_mc_simulation$y)[6], ncomp = 1)
 plot_pls(pls_result_rice_soybean, threshold = 0)
-```
 
 
-#### With crop rotation of rice and chili (rice-chili)
-
-```{r}
+#with crop rotation of rice and chili (rice-chili)
 pls_result_rice_chili <- plsr.mcSimulation(object = crop_rotation_mc_simulation,
                                            resultName = names(crop_rotation_mc_simulation$y)[7], ncomp = 1)
 plot_pls(pls_result_rice_chili, threshold = 0)
-```
 
 
-## Results
 
-### With crop rotation of 3 crops (rice-soybean-chili)
+# the plots
 
-```{r}
+#with crop rotation of 3 crops
 compound_figure(mcSimulation_object = crop_rotation_mc_simulation, 
                 input_table = input_estimates, plsrResults = pls_result_crop_rotation, 
                 EVPIresults = evpi_crop_rotation, decision_var_name = "NPV_decision_crop_rotation", 
                 cashflow_var_name = "cashflow_crop_rotation", 
                 base_size = 7)
-```
 
 
-
-### With crop rotation of rice and soybean (rice-soybean-rice)
-
-```{r}
+#with crop rotation of rice and soybean (rice-soybean-rice)
 compound_figure(mcSimulation_object = crop_rotation_mc_simulation, 
                 input_table = input_estimates, plsrResults = pls_result_rice_soybean, 
                 EVPIresults = evpi_rice_soybean, decision_var_name = "NPV_decision_rice_soybean", 
                 cashflow_var_name = "cashflow_rice_soybean", 
                 base_size = 7)
-```
 
-
-### With crop rotation of rice and chili (rice-chili) 
-
-```{r}
+#with crop rotation of rice and chili (rice-chili)
 compound_figure(mcSimulation_object = crop_rotation_mc_simulation, 
                 input_table = input_estimates, plsrResults = pls_result_rice_chili, 
                 EVPIresults = evpi_rice_chili, decision_var_name = "NPV_decision_rice_chili", 
                 cashflow_var_name = "cashflow_rice_chili", 
                 base_size = 7)
-```
-
-
-## Conclusion
-
-1. This project has proven that selecting the appropriate crop rotation between rice, soybean, and chili seem profitable for achieving optimal results with respect to higher income for rice farming.
-2. The decision to rotate crops between rice and chili is still applicable with slightly smaller profits. 
-3. Crop rotation between rice, soybean, and rice is less efficient than other options with respect to sustainable income.
-
-## Recommendtion
-
-1.We **recommend** Indonesian smallholder farmers to implement crop rotation either for three crops **(rice, soybean, and chili)** or two crops **(rice and chili)** as it seems more profitable than growing rice only all year around.
-
-2.However, we would **not recommend** to implement crop rotation between **rice and soybean** as it seems not so profitable.
-
-## What we have learned from this project?
-
-1. Rice farming with crop rotation of soybean and chili can be implemented by Indonesian smallholder farmers to get higher income.
-2. However, not every crops are profitable to be rotated with rice.
-3. There are more uncertainties in crop rotation of rice and soybean compared to other scenarios. Thus, further data and research still needed.
-
-
-## Reference
-
-```{r add_R_bib, include=FALSE}
-knitr::write_bib(c(.packages(),
-                   'knitr','decisionSupport'), 'export.bib')
-```
 
